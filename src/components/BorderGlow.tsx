@@ -104,18 +104,27 @@ const BorderGlow: React.FC<BorderGlowProps> = ({
     card.style.setProperty('--edge-proximity', '100'); // Keep the glow fully visible
 
     let animationFrameId: number;
-    const startTime = performance.now();
+    let isVisible = false;
+
+    const observer = new IntersectionObserver(([entry]) => {
+      isVisible = entry.isIntersecting;
+      if (isVisible) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = requestAnimationFrame(animate);
+      }
+    }, { threshold: 0 });
+    
+    observer.observe(card);
 
     const animate = (time: number) => {
-      const elapsed = time - startTime;
-      const angle = (elapsed / 3000) * 360; // Completes a 360-degree rotation every 3 seconds
+      if (!isVisible) return;
+      const angle = (time / 3000) * 360; // Completes a 360-degree rotation every 3 seconds
       card.style.setProperty('--cursor-angle', `${angle % 360}deg`);
       animationFrameId = requestAnimationFrame(animate);
     };
 
-    animationFrameId = requestAnimationFrame(animate);
-
     return () => {
+      observer.disconnect();
       cancelAnimationFrame(animationFrameId);
       card.classList.remove('sweep-active');
       card.style.setProperty('--edge-proximity', '0');
