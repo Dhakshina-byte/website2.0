@@ -18,12 +18,25 @@ export default function App() {
 
   const isScrollingRef = useRef(false);
   const scrollAccumulatorRef = useRef(0);
+  const touchStartYRef = useRef(0);
 
   // Apply global snap scrolling to the HTML element
   // This prevents the "locked scrollbar" issue when Shadcn Dialogs are opened!
   useEffect(() => {
     document.documentElement.classList.add('snap-y', 'snap-mandatory');
     document.documentElement.style.scrollBehavior = 'smooth'; // Guarantees all native jumps are smooth
+
+    const isInsideScrollable = (el: EventTarget | null): boolean => {
+      let target = el as HTMLElement | null;
+      while (target && target !== document.body && target !== document.documentElement) {
+        const style = window.getComputedStyle(target);
+        if ((style.overflowY === 'auto' || style.overflowY === 'scroll') && target.scrollHeight > target.clientHeight) {
+          return true;
+        }
+        target = target.parentElement;
+      }
+      return false;
+    };
 
     const handleWheel = (e: WheelEvent) => {
       // 1. Allow native pinch-to-zoom
@@ -33,17 +46,7 @@ export default function App() {
       if (document.body.style.pointerEvents === 'none') return;
       
       // 3. Allow native scroll inside scrollable child elements (like Dialog content)
-      let target = e.target as HTMLElement | null;
-      let isScrollableChild = false;
-      while (target && target !== document.body && target !== document.documentElement) {
-        const style = window.getComputedStyle(target);
-        if ((style.overflowY === 'auto' || style.overflowY === 'scroll') && target.scrollHeight > target.clientHeight) {
-          isScrollableChild = true;
-          break;
-        }
-        target = target.parentElement;
-      }
-      if (isScrollableChild) return;
+      if (isInsideScrollable(e.target)) return;
 
       // 4. Take over the scrolling behavior!
       e.preventDefault(); 
@@ -81,12 +84,67 @@ export default function App() {
       }
     };
 
+    // Touch event handlers for mobile swipe navigation
+    const handleTouchStart = (e: TouchEvent) => {
+      if (document.body.style.pointerEvents === 'none' || isInsideScrollable(e.target)) return;
+      touchStartYRef.current = e.touches[0].clientY;
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      // Prevent native scroll only if we are not inside a scrollable element.
+      if (document.body.style.pointerEvents === 'none' || isInsideScrollable(e.target)) return;
+      e.preventDefault();
+    };
+
+    const handleTouchEnd = (e: TouchEvent) => {
+      if (document.body.style.pointerEvents === 'none' || isInsideScrollable(e.target) || touchStartYRef.current === 0) {
+        touchStartYRef.current = 0;
+        return;
+      }
+
+      const touchEndY = e.changedTouches[0].clientY;
+      const deltaY = touchStartYRef.current - touchEndY;
+      touchStartYRef.current = 0; // Reset for next touch
+
+      if (isScrollingRef.current) return;
+
+      // Threshold for swipe gesture
+      if (Math.abs(deltaY) > 50) {
+        const sections = ['hero', 'about', 'experience', 'projects', 'contact'];
+        const currentSectionIndex = sections.findIndex(id => {
+          const el = document.getElementById(id);
+          if (!el) return false;
+          const rect = el.getBoundingClientRect();
+          return rect.top > -window.innerHeight / 2 && rect.top < window.innerHeight / 2;
+        });
+
+        if (currentSectionIndex !== -1) {
+          const nextIndex = deltaY > 0
+            ? Math.min(currentSectionIndex + 1, sections.length - 1) // Swipe Up -> Scroll Down
+            : Math.max(currentSectionIndex - 1, 0); // Swipe Down -> Scroll Up
+
+          if (nextIndex !== currentSectionIndex) {
+            isScrollingRef.current = true;
+            document.getElementById(sections[nextIndex])?.scrollIntoView({ behavior: 'smooth' });
+            
+            setTimeout(() => { isScrollingRef.current = false; }, 800);
+          }
+        }
+      }
+    };
+
     window.addEventListener('wheel', handleWheel, { passive: false });
+    window.addEventListener('touchstart', handleTouchStart, { passive: false });
+    window.addEventListener('touchmove', handleTouchMove, { passive: false });
+    window.addEventListener('touchend', handleTouchEnd, { passive: false });
 
     return () => {
       document.documentElement.classList.remove('snap-y', 'snap-mandatory');
       document.documentElement.style.scrollBehavior = '';
       window.removeEventListener('wheel', handleWheel);
+      window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('touchend', handleTouchEnd);
     };
   }, []);
 
@@ -209,8 +267,7 @@ export default function App() {
             <div className="p-6 md:p-12 flex flex-col-reverse md:flex-row items-center justify-between gap-8 md:gap-12 rounded-[24px] bg-black/40 backdrop-blur-sm border border-white/5 w-full">
               <div className="flex flex-col gap-4 text-center md:text-left flex-1">
                 <p className="text-xs text-white/50 tracking-widest leading-relaxed">
-                 Hi, I'm Dhakshina Perera, a Full-Stack Developer and Software Engineering undergraduate based in Colombo. I specialize in building versatile solutions, from robust C# and Java desktop applications to interactive 3D web experiences using React and Three.js. Whether I am writing clean, object-oriented code or tinkering with Arduino IoT hardware, I am passionate about solving com
-                </p>
+Hi, I'm Dhakshina Perera, a Full-Stack Developer and Software Engineering undergraduate based in Colombo. I specialize in building versatile solutions, from robust C# and Java desktop applications to interactive 3D web experiences using React and Three.js. Whether I am writing clean, object-oriented code or tinkering with Arduino IoT hardware, I am passionate about solving complex problems and engineering scalable software.                </p>
                 <p className="text-xs text-white/50 tracking-widest leading-relaxed">
                 </p>
               </div>
