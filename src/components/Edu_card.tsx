@@ -40,9 +40,9 @@ const certificationsData = [
 
 function WithCard() {
   return (
-    <Card className="w-full max-w-4xl mx-auto bg-black/40 backdrop-blur-sm border-white/10 text-white"> 
+    <Card className="w-full max-w-4xl mx-auto bg-[#111114]/90 border-white/10 text-white"> 
       <CardHeader>
-      <CardTitle>Proffessional Details</CardTitle>
+      <CardTitle> Professional Details </CardTitle>
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="overview">

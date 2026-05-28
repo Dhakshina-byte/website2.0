@@ -264,7 +264,7 @@ export default function App() {
       <section id="about" className="snap-start min-h-screen flex flex-col items-center justify-center relative z-10 pointer-events-none py-24">
         <div className="w-full max-w-[90vw] md:max-w-4xl text-white/20 text-sm tracking-[0.3em] uppercase pointer-events-auto">
           <BorderGlow colors={["#f4f12c"]} borderRadius={24} animated={true}>
-            <div className="p-6 md:p-12 flex flex-col-reverse md:flex-row items-center justify-between gap-8 md:gap-12 rounded-[24px] bg-black/40 backdrop-blur-sm border border-white/5 w-full">
+            <div className="p-6 md:p-12 flex flex-col-reverse md:flex-row items-center justify-between gap-8 md:gap-12 rounded-[24px] bg-[#111114]/90 border border-white/5 w-full">
               <div className="flex flex-col gap-4 text-center md:text-left flex-1">
                 <p className="text-xs text-white/50 tracking-widest leading-relaxed">
 Hi, I'm Dhakshina Perera, a Full-Stack Developer and Software Engineering undergraduate based in Colombo. I specialize in building versatile solutions, from robust C# and Java desktop applications to interactive 3D web experiences using React and Three.js. Whether I am writing clean, object-oriented code or tinkering with Arduino IoT hardware, I am passionate about solving complex problems and engineering scalable software.                </p>
