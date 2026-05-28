@@ -161,10 +161,6 @@ const GlassSurface: React.FC<GlassSurfaceProps> = ({
     setTimeout(updateDisplacementMap, 0);
   }, [width, height]);
 
-  useEffect(() => {
-    setSvgSupported(supportsSVGFilters());
-  }, []);
-
   const supportsSVGFilters = () => {
     if (typeof window === 'undefined' || typeof document === 'undefined') {
       return false;
@@ -182,6 +178,10 @@ const GlassSurface: React.FC<GlassSurfaceProps> = ({
 
     return div.style.backdropFilter !== '';
   };
+
+  useEffect(() => {
+    setSvgSupported(supportsSVGFilters());
+  }, []);
 
   const containerStyle: React.CSSProperties = {
     ...style,

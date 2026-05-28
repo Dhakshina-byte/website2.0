@@ -262,7 +262,7 @@ export default function App() {
 
       {/* About Section */}
       <section id="about" className="snap-start min-h-screen flex flex-col items-center justify-center relative z-10 pointer-events-none py-24">
-        <div className="w-full max-w-[90vw] md:max-w-4xl text-white/20 text-sm tracking-[0.3em] uppercase pointer-events-auto">
+        <div className="w-full max-w-[90vw] md:max-w-4xl text-white/20 text-sm tracking-[0.3em] uppercase pointer-events-auto -translate-y-12 md:-translate-y-20">
           <BorderGlow colors={["#f4f12c"]} borderRadius={24} animated={true}>
             <div className="p-6 md:p-12 flex flex-col-reverse md:flex-row items-center justify-between gap-8 md:gap-12 rounded-[24px] bg-[#111114]/90 border border-white/5 w-full">
               <div className="flex flex-col gap-4 text-center md:text-left flex-1">
