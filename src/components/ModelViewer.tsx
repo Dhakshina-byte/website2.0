@@ -238,7 +238,7 @@ const ModelViewer: React.FC = () => {
                 <a href="https://www.linkedin.com/in/dhakshina-perera-b50a6223b/" target="_blank" rel="noopener noreferrer">
                   <FaLinkedin /> LinkedIn
                 </a>
-                <a href="https://www.instagram.com/dhakshina_perera/" target="_blank" rel="noopener noreferrer">
+                <a href="https://www.instagram.com/_dhakshina_perera_?igsh=eXpwY3BvajN5YjRw" target="_blank" rel="noopener noreferrer">
                   <FaInstagram /> Instagram
                 </a>
               </div>
