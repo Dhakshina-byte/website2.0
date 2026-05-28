@@ -11,6 +11,7 @@ export default defineConfig({
     tailwindcss(),
     babel({ presets: [reactCompilerPreset()] })
   ],
+  base: '/',
   assetsInclude: ['**/*.glb'],
   resolve: {
     alias: {
