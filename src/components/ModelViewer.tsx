@@ -3,8 +3,7 @@ import { Canvas, useThree } from '@react-three/fiber';
 import { OrbitControls, useGLTF, Html } from '@react-three/drei';
 import * as THREE from 'three';
 import ContactChat from './ContactChat';
-
-const MODEL_URL = 'src\\assets\\3d_model\\laptop_3d_model_asus_tuf_dash_f15_2022.glb';
+import modelUrl from '@/assets/3d_model/laptop_3d_model_asus_tuf_dash_f15_2022.glb?url';
 
 function Model({ url }: { url: string }) {
   const { scene } = useGLTF(url);
@@ -193,7 +192,7 @@ const ModelViewer: React.FC = () => {
             <Suspense fallback={
               <Html center><div className="text-white/60 tracking-widest text-xs uppercase whitespace-nowrap">Loading 3D Model...</div></Html>
             }>
-              <Model url={MODEL_URL} />
+              <Model url={modelUrl} />
             </Suspense>
             <OrbitControls makeDefault target={[0.55, -0.3, 0]} />
           </Canvas>
@@ -205,6 +204,6 @@ const ModelViewer: React.FC = () => {
   );
 };
 
-useGLTF.preload(MODEL_URL);
+useGLTF.preload(modelUrl);
 
 export default ModelViewer;
