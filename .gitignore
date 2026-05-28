@@ -24,3 +24,7 @@ dist-ssr
 *.sw?
 
 git rm --cached .env
+
+git add -f src/assets/3d_model/laptop_3d_model_asus_tuf_dash_f15_2022.glb
+git commit -m "add glb model"
+git push
