@@ -101,7 +101,8 @@ const AntigravityInner: React.FC<AntigravityProps> = ({
 
     if (mouseDist > 0.001) {
       lastMouseMoveTime.current = Date.now();
-      lastMousePos.current = { x: m.x, y: m.y };
+      lastMousePos.current.x = m.x;
+      lastMousePos.current.y = m.y;
     }
 
     let destX = (m.x * v.width) / 2;
@@ -136,7 +137,9 @@ const AntigravityInner: React.FC<AntigravityProps> = ({
       const dy = my - projectedTargetY;
       const dist = Math.sqrt(dx * dx + dy * dy);
 
-      const targetPos = { x: mx, y: my, z: mz * depthFactor };
+      let targetPosX = mx;
+      let targetPosY = my;
+      let targetPosZ = mz * depthFactor;
 
       if (dist < magnetRadius) {
         const angle = Math.atan2(dy, dx) + globalRotation;
@@ -146,14 +149,14 @@ const AntigravityInner: React.FC<AntigravityProps> = ({
 
         const currentRingRadius = ringRadius + wave + deviation;
 
-        targetPos.x = projectedTargetX + currentRingRadius * Math.cos(angle);
-        targetPos.y = projectedTargetY + currentRingRadius * Math.sin(angle);
-        targetPos.z = mz * depthFactor + Math.sin(t) * (1 * waveAmplitude * depthFactor);
+        targetPosX = projectedTargetX + currentRingRadius * Math.cos(angle);
+        targetPosY = projectedTargetY + currentRingRadius * Math.sin(angle);
+        targetPosZ = mz * depthFactor + Math.sin(t) * (1 * waveAmplitude * depthFactor);
       }
 
-      particle.cx += (targetPos.x - particle.cx) * lerpSpeed;
-      particle.cy += (targetPos.y - particle.cy) * lerpSpeed;
-      particle.cz += (targetPos.z - particle.cz) * lerpSpeed;
+      particle.cx += (targetPosX - particle.cx) * lerpSpeed;
+      particle.cy += (targetPosY - particle.cy) * lerpSpeed;
+      particle.cz += (targetPosZ - particle.cz) * lerpSpeed;
 
       dummy.position.set(particle.cx, particle.cy, particle.cz);
 
