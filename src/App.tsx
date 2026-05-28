@@ -9,6 +9,7 @@ import DecryptedText from './components/DecryptedText'
 import WithCard from './components/Edu_card'
 import Gallery6Demo from './components/Projects'
 import LogoLoop from './components/LogoLoop'
+import ModelViewer from './components/ModelViewer'
 
 const Antigravity = lazy(() => import('./components/Antigravity'));
 
@@ -243,8 +244,11 @@ export default function App() {
       <section id="contact" className="snap-start min-h-screen flex flex-col items-center justify-center relative z-10 pointer-events-none py-24">
         <div className="absolute top-4 md:top-8 w-full pointer-events-auto">
           <LogoLoop />
+          
         </div>
-       
+        <div className="mt-16 md:mt-24 pointer-events-auto">
+          <ModelViewer />
+        </div>
       </section>
 
     </main>
