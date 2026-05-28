@@ -1,9 +1,10 @@
-import React, { Suspense, useEffect, useRef } from 'react';
+import React, { Suspense, useEffect, useRef, useState } from 'react';
 import { Canvas, useThree } from '@react-three/fiber';
 import { OrbitControls, useGLTF, Html } from '@react-three/drei';
 import * as THREE from 'three';
 import ContactChat from './ContactChat';
 import modelUrl from '@/assets/3d_model/laptop_3d_model_asus_tuf_dash_f15_2022.glb?url';
+import { FaGithub, FaLinkedin, FaInstagram } from "react-icons/fa";
 
 function Model({ url }: { url: string }) {
   const { scene } = useGLTF(url);
@@ -47,8 +48,9 @@ function Model({ url }: { url: string }) {
 
   return <group ref={groupRef}><primitive object={scene} /></group>;
 }
-
 const ModelViewer: React.FC = () => {
+  const [socialOpen, setSocialOpen] = useState(false);
+
   return (
     <>
       <style>{`
@@ -64,28 +66,72 @@ const ModelViewer: React.FC = () => {
           font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
         }
 
-        .mv-contact-btn {
+        .mv-actions {
           position: absolute;
           top: 16px;
           right: 16px;
           z-index: 10;
-          padding: 8px 18px;
-          background-color: transparent;
-          color: #ffffff;
-          border: 1.5px solid rgba(255,255,255,0.7);
-          border-radius: 9999px;
-          font-size: 13px;
-          font-weight: 500;
-          cursor: pointer;
-          letter-spacing: 0.01em;
-          backdrop-filter: blur(4px);
-          transition: background-color 0.2s, border-color 0.2s;
-          white-space: nowrap;
+          display: flex;
+          gap: 12px;
+          align-items: center;
         }
-        .mv-contact-btn:hover {
-          background-color: rgba(255,255,255,0.12);
-          border-color: #ffffff;
+        .mv-wrapper .cc-trigger {
+          position: static !important;
         }
+
+       .mv-social-btn {
+  padding: 8px 18px;
+  background-color: transparent;
+  color: #ffffff;
+  border: 1.5px solid rgba(255,255,255,0.7);
+  border-radius: 9999px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  letter-spacing: 0.01em;
+  backdrop-filter: blur(4px);
+  transition: background-color 0.2s, border-color 0.2s;
+  white-space: nowrap;
+}
+.mv-social-btn:hover {
+  background-color: rgba(255,255,255,0.12);
+  border-color: #ffffff;
+}
+.mv-social-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 20;
+  background: rgba(20,20,24,0.95);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 12px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 140px;
+  backdrop-filter: blur(12px);
+}
+.mv-social-dropdown a {
+  color: rgba(255,255,255,0.8);
+  text-decoration: none;
+  font-size: 13px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: background 0.15s, color 0.15s;
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.mv-social-dropdown a svg {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+.mv-social-dropdown a:hover {
+  background: rgba(255,255,255,0.08);
+  color: #ffffff;
+}
 
         /* Centered headline overlay */
         .mv-headline {
@@ -149,7 +195,12 @@ const ModelViewer: React.FC = () => {
             margin: 0 16px;
           }
           .mv-headline { left: 16px; }
-          .mv-contact-btn { top: 10px; right: 10px; padding: 6px 12px; font-size: 10px; }
+        .mv-actions { top: 10px; right: 10px; gap: 8px; }
+        .mv-wrapper .cc-trigger { padding: 6px 12px !important; font-size: 10px !important; }
+        .mv-social-btn { padding: 6px 12px; font-size: 10px; }
+        .mv-social-dropdown { min-width: 120px; padding: 6px; }
+      .mv-social-dropdown a { font-size: 12px; padding: 8px 10px; gap: 6px; }
+      .mv-social-dropdown a svg { font-size: 16px; }
         }
 
         @media (min-width: 481px) and (max-width: 768px) {
@@ -160,7 +211,12 @@ const ModelViewer: React.FC = () => {
             margin: 0 20px;
           }
           .mv-headline { left: 22px; }
-          .mv-contact-btn { top: 14px; right: 14px; padding: 7px 15px; font-size: 12px; }
+        .mv-actions { top: 14px; right: 14px; gap: 10px; }
+        .mv-wrapper .cc-trigger { padding: 7px 15px !important; font-size: 12px !important; }
+        .mv-social-btn { padding: 7px 15px; font-size: 12px; }
+        .mv-social-dropdown { min-width: 130px; }
+      .mv-social-dropdown a { font-size: 12px; padding: 8px 10px; }
+      .mv-social-dropdown a svg { font-size: 18px; }
         }
 
         @media (min-width: 769px) and (max-width: 1024px) {
@@ -169,8 +225,28 @@ const ModelViewer: React.FC = () => {
       `}</style>
 
       <div className="mv-wrapper">
-        <ContactChat />
-
+        <div className="mv-actions">
+          <div style={{ position: 'relative' }}>
+            <button className="mv-social-btn" onClick={() => setSocialOpen(o => !o)}>
+              Social
+            </button>
+            {socialOpen && (
+              <div className="mv-social-dropdown">
+                <a href="https://github.com/Dhakshina-byte" target="_blank" rel="noopener noreferrer">
+                  <FaGithub /> GitHub
+                </a>
+                <a href="https://www.linkedin.com/in/dhakshina-perera-b50a6223b/" target="_blank" rel="noopener noreferrer">
+                  <FaLinkedin /> LinkedIn
+                </a>
+                <a href="https://www.instagram.com/dhakshina_perera/" target="_blank" rel="noopener noreferrer">
+                  <FaInstagram /> Instagram
+                </a>
+              </div>
+            )}
+          </div>
+          <ContactChat />
+        </div>
+        
         <div className="mv-headline">
           <h1>
             <span className="word-1">Code.</span>
