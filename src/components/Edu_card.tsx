@@ -46,10 +46,10 @@ function WithCard() {
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="overview">
-          <TabsList className="mb-4 bg-white/50 border border-white/10 w-full h-auto flex-wrap justify-start sm:justify-center gap-1 p-1">
-            <TabsTrigger value="overview">Experience</TabsTrigger>
-            <TabsTrigger value="saved">Education</TabsTrigger>
-            <TabsTrigger value="groups">Skills/Certifications</TabsTrigger>
+          <TabsList className="mb-4 bg-white/5 border border-white/10 w-full h-auto flex flex-nowrap overflow-x-auto justify-start sm:justify-center gap-1 p-1 rounded-md">
+            <TabsTrigger className="flex-1 text-xs sm:text-sm whitespace-nowrap py-1.5 px-2 text-white" value="overview">Experience</TabsTrigger>
+            <TabsTrigger className="flex-1 text-xs sm:text-sm whitespace-nowrap py-1.5 px-2 text-white" value="saved">Education</TabsTrigger>
+            <TabsTrigger className="flex-1 text-xs sm:text-sm whitespace-nowrap py-1.5 px-2 text-white" value="groups">Skills & Certs</TabsTrigger>
           </TabsList>
           <TabsContent value="overview">
             <div className="grid gap-4">

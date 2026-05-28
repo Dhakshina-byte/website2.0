@@ -48,26 +48,6 @@ function buildGradientVars(colors: string[]): Record<string, string> {
   return vars;
 }
 
-function easeOutCubic(x: number) { return 1 - Math.pow(1 - x, 3); }
-function easeInCubic(x: number) { return x * x * x; }
-
-interface AnimateOpts {
-  start?: number; end?: number; duration?: number; delay?: number;
-  ease?: (t: number) => number; onUpdate: (v: number) => void; onEnd?: () => void;
-}
-
-function animateValue({ start = 0, end = 100, duration = 1000, delay = 0, ease = easeOutCubic, onUpdate, onEnd }: AnimateOpts) {
-  const t0 = performance.now() + delay;
-  function tick() {
-    const elapsed = performance.now() - t0;
-    const t = Math.min(elapsed / duration, 1);
-    onUpdate(start + (end - start) * ease(t));
-    if (t < 1) requestAnimationFrame(tick);
-    else if (onEnd) onEnd();
-  }
-  setTimeout(() => requestAnimationFrame(tick), delay);
-}
-
 const BorderGlow: React.FC<BorderGlowProps> = ({
   children,
   className = '',
@@ -112,6 +92,8 @@ const BorderGlow: React.FC<BorderGlowProps> = ({
   }, [getCenterOfElement]);
 
   const handlePointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    if (animated) return; // Ignore pointer events if the border is auto-animating
+    
     const card = cardRef.current;
     if (!card) return;
 
@@ -129,22 +111,27 @@ const BorderGlow: React.FC<BorderGlowProps> = ({
   useEffect(() => {
     if (!animated || !cardRef.current) return;
     const card = cardRef.current;
-    const angleStart = 110;
-    const angleEnd = 465;
+    
     card.classList.add('sweep-active');
-    card.style.setProperty('--cursor-angle', `${angleStart}deg`);
+    card.style.setProperty('--edge-proximity', '100'); // Keep the glow fully visible
 
-    animateValue({ duration: 500, onUpdate: v => card.style.setProperty('--edge-proximity', `${v}`) });
-    animateValue({ ease: easeInCubic, duration: 1500, end: 50, onUpdate: v => {
-      card.style.setProperty('--cursor-angle', `${(angleEnd - angleStart) * (v / 100) + angleStart}deg`);
-    }});
-    animateValue({ ease: easeOutCubic, delay: 1500, duration: 2250, start: 50, end: 100, onUpdate: v => {
-      card.style.setProperty('--cursor-angle', `${(angleEnd - angleStart) * (v / 100) + angleStart}deg`);
-    }});
-    animateValue({ ease: easeInCubic, delay: 2500, duration: 1500, start: 100, end: 0,
-      onUpdate: v => card.style.setProperty('--edge-proximity', `${v}`),
-      onEnd: () => card.classList.remove('sweep-active'),
-    });
+    let animationFrameId: number;
+    const startTime = performance.now();
+
+    const animate = (time: number) => {
+      const elapsed = time - startTime;
+      const angle = (elapsed / 3000) * 360; // Completes a 360-degree rotation every 3 seconds
+      card.style.setProperty('--cursor-angle', `${angle % 360}deg`);
+      animationFrameId = requestAnimationFrame(animate);
+    };
+
+    animationFrameId = requestAnimationFrame(animate);
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      card.classList.remove('sweep-active');
+      card.style.setProperty('--edge-proximity', '0');
+    };
   }, [animated]);
 
   const glowVars = buildGlowVars(glowColor, glowIntensity);

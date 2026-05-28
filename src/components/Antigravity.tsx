@@ -193,7 +193,7 @@ const AntigravityInner: React.FC<AntigravityProps> = ({
 
 const Antigravity: React.FC<AntigravityProps> = props => {
   return (
-    <Canvas camera={{ position: [0, 0, 50], fov: 35 }}>
+    <Canvas camera={{ position: [0, 0, 50], fov: 35 }} style={{ touchAction: 'auto' }}>
       <AntigravityInner {...props} />
     </Canvas>
   );

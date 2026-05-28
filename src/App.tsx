@@ -1,17 +1,93 @@
-import React, { lazy, Suspense, useEffect, useState } from 'react'
+import React, { lazy, Suspense, useEffect, useState, useRef } from 'react'
 import './App.css'
-import GooeyNav from './components/GooeyNav'
+import PillNav from './components/PillNav'
 import GlassSurface from './components/GlassSurface'
 import BorderGlow from './components/BorderGlow'
 import profileImage from './assets/img/WhatsApp Image 2026-05-27 at 4.27.27 PM.jpeg'
 import BlurText from './components/BlurText'
 import DecryptedText from './components/DecryptedText'
 import WithCard from './components/Edu_card'
+import Gallery6Demo from './components/Projects'
+import LogoLoop from './components/LogoLoop'
 
 const Antigravity = lazy(() => import('./components/Antigravity'));
 
 export default function App() {
   const [activeIndex, setActiveIndex] = useState(0);
+
+  const isScrollingRef = useRef(false);
+  const scrollAccumulatorRef = useRef(0);
+
+  // Apply global snap scrolling to the HTML element
+  // This prevents the "locked scrollbar" issue when Shadcn Dialogs are opened!
+  useEffect(() => {
+    document.documentElement.classList.add('snap-y', 'snap-mandatory');
+    document.documentElement.style.scrollBehavior = 'smooth'; // Guarantees all native jumps are smooth
+
+    const handleWheel = (e: WheelEvent) => {
+      // 1. Allow native pinch-to-zoom
+      if (e.ctrlKey) return; 
+      
+      // 2. Ignore if a Shadcn Dialog is open (body pointer events get locked)
+      if (document.body.style.pointerEvents === 'none') return;
+      
+      // 3. Allow native scroll inside scrollable child elements (like Dialog content)
+      let target = e.target as HTMLElement | null;
+      let isScrollableChild = false;
+      while (target && target !== document.body && target !== document.documentElement) {
+        const style = window.getComputedStyle(target);
+        if ((style.overflowY === 'auto' || style.overflowY === 'scroll') && target.scrollHeight > target.clientHeight) {
+          isScrollableChild = true;
+          break;
+        }
+        target = target.parentElement;
+      }
+      if (isScrollableChild) return;
+
+      // 4. Take over the scrolling behavior!
+      e.preventDefault(); 
+
+      if (isScrollingRef.current) {
+        scrollAccumulatorRef.current = 0; // Prevent queuing up multiple jumps while an animation is active
+        return;
+      }
+
+      scrollAccumulatorRef.current += e.deltaY;
+
+      // Threshold of 60 triggers on 1 classic mouse wheel tick or a deliberate trackpad swipe
+      if (Math.abs(scrollAccumulatorRef.current) > 60) {
+        const sections = ['hero', 'about', 'experience', 'projects', 'contact'];
+        const currentSectionIndex = sections.findIndex(id => {
+          const el = document.getElementById(id);
+          if (!el) return false;
+          const rect = el.getBoundingClientRect();
+          return rect.top > -window.innerHeight / 2 && rect.top < window.innerHeight / 2;
+        });
+
+        if (currentSectionIndex !== -1) {
+          const nextIndex = scrollAccumulatorRef.current > 0 
+            ? Math.min(currentSectionIndex + 1, sections.length - 1) // Scroll down
+            : Math.max(currentSectionIndex - 1, 0); // Scroll up
+
+          if (nextIndex !== currentSectionIndex) {
+            isScrollingRef.current = true;
+            document.getElementById(sections[nextIndex])?.scrollIntoView({ behavior: 'smooth' });
+            
+            setTimeout(() => { isScrollingRef.current = false; }, 800); // Unlock scrolling after animation completes
+          }
+        }
+        scrollAccumulatorRef.current = 0;
+      }
+    };
+
+    window.addEventListener('wheel', handleWheel, { passive: false });
+
+    return () => {
+      document.documentElement.classList.remove('snap-y', 'snap-mandatory');
+      document.documentElement.style.scrollBehavior = '';
+      window.removeEventListener('wheel', handleWheel);
+    };
+  }, []);
 
   // Tracks which section is currently visible to update the navigation automatically
   useEffect(() => {
@@ -77,7 +153,7 @@ export default function App() {
   ];
 
   return (
-    <main className="bg-[#000000] text-white w-full h-screen overflow-y-auto overflow-x-hidden snap-y snap-mandatory max-w-[100vw]">
+    <main className="bg-[#000000] text-white w-full min-h-screen overflow-x-hidden max-w-[100vw]">
       
       {/* Global Background layer */}
       <div className="fixed inset-0 z-0">
@@ -121,21 +197,20 @@ export default function App() {
           </div>
         </div>
       </section>
-
+      
       {/* Navigation Layer (Fixed to screen) */}
-      <GooeyNav items={navItems} activeIndex={activeIndex} />
+      <PillNav items={navItems} activeIndex={activeIndex} />
 
       {/* About Section */}
       <section id="about" className="snap-start min-h-screen flex flex-col items-center justify-center relative z-10 pointer-events-none py-24">
         <div className="w-full max-w-[90vw] md:max-w-4xl text-white/20 text-sm tracking-[0.3em] uppercase pointer-events-auto">
-          <BorderGlow colors={["#f4f12c"]} borderRadius={24}>
+          <BorderGlow colors={["#f4f12c"]} borderRadius={24} animated={true}>
             <div className="p-6 md:p-12 flex flex-col-reverse md:flex-row items-center justify-between gap-8 md:gap-12 rounded-[24px] bg-black/40 backdrop-blur-sm border border-white/5 w-full">
               <div className="flex flex-col gap-4 text-center md:text-left flex-1">
                 <p className="text-xs text-white/50 tracking-widest leading-relaxed">
-                  Hi, I'm Dhakshina Perera. I am a Software Engineering undergraduate and Full-Stack Developer who loves bridging the gap between complex backend logic and engaging user experiences. I am driven by a passion to build software that is highly functional, scalable, and structurally sound.
+                 Hi, I'm Dhakshina Perera, a Full-Stack Developer and Software Engineering undergraduate based in Colombo. I specialize in building versatile solutions, from robust C# and Java desktop applications to interactive 3D web experiences using React and Three.js. Whether I am writing clean, object-oriented code or tinkering with Arduino IoT hardware, I am passionate about solving com
                 </p>
                 <p className="text-xs text-white/50 tracking-widest leading-relaxed">
-                  My technical playground is diverse—ranging from architecting robust desktop applications in C# and Java, like comprehensive point-of-sale and vehicle management systems, to building interactive 3D web experiences using React and Three.js. Whether I am writing clean object-oriented code, stepping outside the browser to tinker with Arduino for IoT projects, or engaging with the tech community as a Student Ambassador, I am always looking for the next technical challenge.
                 </p>
               </div>
               <div className="flex-shrink-0">
@@ -159,16 +234,17 @@ export default function App() {
 
       {/* Projects Section */}
       <section id="projects" className="snap-start min-h-screen flex flex-col items-center justify-center relative z-10 pointer-events-none py-24">
-        <div className="text-white/20 text-sm tracking-[0.3em] uppercase pointer-events-auto">
-          Projects Section
+        <div className="w-full pointer-events-auto -translate-y-12 md:-translate-y-20">
+          <Gallery6Demo />
         </div>
       </section>
 
       {/* Contact Section */}
       <section id="contact" className="snap-start min-h-screen flex flex-col items-center justify-center relative z-10 pointer-events-none py-24">
-        <div className="text-white/20 text-sm tracking-[0.3em] uppercase pointer-events-auto">
-          Contact Section
+        <div className="absolute top-4 md:top-8 w-full pointer-events-auto">
+          <LogoLoop />
         </div>
+       
       </section>
 
     </main>
