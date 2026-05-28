@@ -9,9 +9,9 @@ import DecryptedText from './components/DecryptedText'
 import WithCard from './components/Edu_card'
 import Gallery6Demo from './components/Projects'
 import LogoLoop from './components/LogoLoop'
-import ModelViewer from './components/ModelViewer'
 
 const Antigravity = lazy(() => import('./components/Antigravity'));
+const ModelViewer = lazy(() => import('./components/ModelViewer'));
 
 export default function App() {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -247,7 +247,9 @@ export default function App() {
           
         </div>
         <div className="mt-16 md:mt-24 pointer-events-auto">
-          <ModelViewer />
+          <Suspense fallback={<div className="flex items-center justify-center h-64 text-white/50 tracking-widest uppercase text-sm">Loading Workspace...</div>}>
+            <ModelViewer />
+          </Suspense>
         </div>
       </section>
 

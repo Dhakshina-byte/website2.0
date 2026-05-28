@@ -1,6 +1,6 @@
 import React, { Suspense, useEffect, useRef } from 'react';
 import { Canvas, useThree } from '@react-three/fiber';
-import { OrbitControls, useGLTF } from '@react-three/drei';
+import { OrbitControls, useGLTF, Html } from '@react-three/drei';
 import * as THREE from 'three';
 import ContactChat from './ContactChat';
 
@@ -190,7 +190,9 @@ const ModelViewer: React.FC = () => {
             <spotLight position={[5, 8, 5]} angle={0.2} penumbra={1} decay={0} intensity={Math.PI * 1.5} />
             <pointLight position={[-8, -8, -8]} decay={0} intensity={Math.PI} />
             <directionalLight position={[3, 3, 3]} intensity={1.5} />
-            <Suspense fallback={null}>
+            <Suspense fallback={
+              <Html center><div className="text-white/60 tracking-widest text-xs uppercase whitespace-nowrap">Loading 3D Model...</div></Html>
+            }>
               <Model url={MODEL_URL} />
             </Suspense>
             <OrbitControls makeDefault target={[0.55, -0.3, 0]} />
