@@ -45,48 +45,6 @@ export default function App() {
       return false;
     };
 
-    let touchStartY = 0;
-
-    const handleTouchStart = (e: TouchEvent) => {
-      if (document.body.style.pointerEvents === 'none') return;
-      if (isInsideScrollable(e.target)) return;
-      touchStartY = e.touches[0].clientY;
-    };
-
-    const handleTouchEnd = (e: TouchEvent) => {
-      if (document.body.style.pointerEvents === 'none') return;
-      if (isInsideScrollable(e.target)) return;
-
-      const touchEndY = e.changedTouches[0].clientY;
-      const swipeDistance = touchStartY - touchEndY;
-
-      if (isScrollingRef.current) return;
-
-      // A small swipe distance (40px) triggers the page change
-      if (Math.abs(swipeDistance) > 40) {
-        const sections = ['hero', 'about', 'experience', 'projects', 'contact'];
-        const currentSectionIndex = sections.findIndex(id => {
-          const el = document.getElementById(id);
-          if (!el) return false;
-          const rect = el.getBoundingClientRect();
-          return rect.top > -window.innerHeight / 2 && rect.top < window.innerHeight / 2;
-        });
-
-        if (currentSectionIndex !== -1) {
-          const nextIndex = swipeDistance > 0 
-            ? Math.min(currentSectionIndex + 1, sections.length - 1) // Swiped up -> scroll down
-            : Math.max(currentSectionIndex - 1, 0); // Swiped down -> scroll up
-
-          if (nextIndex !== currentSectionIndex) {
-            isScrollingRef.current = true;
-            document.getElementById(sections[nextIndex])?.scrollIntoView({ behavior: 'smooth' });
-            
-            setTimeout(() => { isScrollingRef.current = false; }, 800);
-          }
-        }
-      }
-    };
-
     const handleWheel = (e: WheelEvent) => {
       // 1. Allow native pinch-to-zoom
       if (e.ctrlKey) return; 
@@ -134,15 +92,11 @@ export default function App() {
     };
 
     window.addEventListener('wheel', handleWheel, { passive: false });
-    window.addEventListener('touchstart', handleTouchStart, { passive: true });
-    window.addEventListener('touchend', handleTouchEnd, { passive: true });
 
     return () => {
       document.documentElement.classList.remove('snap-y', 'snap-mandatory');
       document.documentElement.style.scrollBehavior = '';
       window.removeEventListener('wheel', handleWheel);
-      window.removeEventListener('touchstart', handleTouchStart);
-      window.removeEventListener('touchend', handleTouchEnd);
     };
   }, []);
 
