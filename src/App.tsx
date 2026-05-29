@@ -45,6 +45,29 @@ export default function App() {
       return false;
     };
 
+    const navigateSection = (delta: number) => {
+      const sections = ['hero', 'about', 'experience', 'projects', 'contact'];
+      const currentSectionIndex = sections.findIndex(id => {
+        const el = document.getElementById(id);
+        if (!el) return false;
+        const rect = el.getBoundingClientRect();
+        return rect.top > -window.innerHeight / 2 && rect.top < window.innerHeight / 2;
+      });
+
+      if (currentSectionIndex !== -1) {
+        const nextIndex = delta > 0 
+          ? Math.min(currentSectionIndex + 1, sections.length - 1) // Scroll down
+          : Math.max(currentSectionIndex - 1, 0); // Scroll up
+
+        if (nextIndex !== currentSectionIndex) {
+          isScrollingRef.current = true;
+          document.getElementById(sections[nextIndex])?.scrollIntoView({ behavior: 'smooth' });
+          
+          setTimeout(() => { isScrollingRef.current = false; }, 800); // Unlock scrolling after animation completes
+        }
+      }
+    };
+
     const handleWheel = (e: WheelEvent) => {
       // 1. Allow native pinch-to-zoom
       if (e.ctrlKey) return; 
@@ -67,36 +90,45 @@ export default function App() {
 
       // Threshold of 60 triggers on 1 classic mouse wheel tick or a deliberate trackpad swipe
       if (Math.abs(scrollAccumulatorRef.current) > 60) {
-        const sections = ['hero', 'about', 'experience', 'projects', 'contact'];
-        const currentSectionIndex = sections.findIndex(id => {
-          const el = document.getElementById(id);
-          if (!el) return false;
-          const rect = el.getBoundingClientRect();
-          return rect.top > -window.innerHeight / 2 && rect.top < window.innerHeight / 2;
-        });
-
-        if (currentSectionIndex !== -1) {
-          const nextIndex = scrollAccumulatorRef.current > 0 
-            ? Math.min(currentSectionIndex + 1, sections.length - 1) // Scroll down
-            : Math.max(currentSectionIndex - 1, 0); // Scroll up
-
-          if (nextIndex !== currentSectionIndex) {
-            isScrollingRef.current = true;
-            document.getElementById(sections[nextIndex])?.scrollIntoView({ behavior: 'smooth' });
-            
-            setTimeout(() => { isScrollingRef.current = false; }, 800); // Unlock scrolling after animation completes
-          }
-        }
+        navigateSection(scrollAccumulatorRef.current);
         scrollAccumulatorRef.current = 0;
       }
     };
 
+    let touchStartY = 0;
+
+    const handleTouchStart = (e: TouchEvent) => {
+      if (document.body.style.pointerEvents === 'none') return;
+      if (isInsideScrollable(e.target)) return;
+      touchStartY = e.touches[0].clientY;
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (document.body.style.pointerEvents === 'none') return;
+      if (isInsideScrollable(e.target)) return;
+      e.preventDefault(); // Prevent native scroll to avoid stopping halfway
+
+      if (isScrollingRef.current) return;
+
+      const touchCurrentY = e.touches[0].clientY;
+      const deltaY = touchStartY - touchCurrentY;
+
+      if (Math.abs(deltaY) > 50) { // Threshold for swipe
+        navigateSection(deltaY);
+        touchStartY = touchCurrentY; // Reset touch start to prevent multiple rapid triggers
+      }
+    };
+
     window.addEventListener('wheel', handleWheel, { passive: false });
+    window.addEventListener('touchstart', handleTouchStart, { passive: false });
+    window.addEventListener('touchmove', handleTouchMove, { passive: false });
 
     return () => {
       document.documentElement.classList.remove('snap-y', 'snap-mandatory');
       document.documentElement.style.scrollBehavior = '';
       window.removeEventListener('wheel', handleWheel);
+      window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchmove', handleTouchMove);
     };
   }, []);
 
