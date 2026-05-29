@@ -18,7 +18,14 @@ export default function App() {
 
   const isScrollingRef = useRef(false);
   const scrollAccumulatorRef = useRef(0);
-  const touchStartYRef = useRef(0);
+
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Apply global snap scrolling to the HTML element
   // This prevents the "locked scrollbar" issue when Shadcn Dialogs are opened!
@@ -84,67 +91,12 @@ export default function App() {
       }
     };
 
-    // Touch event handlers for mobile swipe navigation
-    const handleTouchStart = (e: TouchEvent) => {
-      if (document.body.style.pointerEvents === 'none' || isInsideScrollable(e.target)) return;
-      touchStartYRef.current = e.touches[0].clientY;
-    };
-
-    const handleTouchMove = (e: TouchEvent) => {
-      // Prevent native scroll only if we are not inside a scrollable element.
-      if (document.body.style.pointerEvents === 'none' || isInsideScrollable(e.target)) return;
-      e.preventDefault();
-    };
-
-    const handleTouchEnd = (e: TouchEvent) => {
-      if (document.body.style.pointerEvents === 'none' || isInsideScrollable(e.target) || touchStartYRef.current === 0) {
-        touchStartYRef.current = 0;
-        return;
-      }
-
-      const touchEndY = e.changedTouches[0].clientY;
-      const deltaY = touchStartYRef.current - touchEndY;
-      touchStartYRef.current = 0; // Reset for next touch
-
-      if (isScrollingRef.current) return;
-
-      // Threshold for swipe gesture
-      if (Math.abs(deltaY) > 50) {
-        const sections = ['hero', 'about', 'experience', 'projects', 'contact'];
-        const currentSectionIndex = sections.findIndex(id => {
-          const el = document.getElementById(id);
-          if (!el) return false;
-          const rect = el.getBoundingClientRect();
-          return rect.top > -window.innerHeight / 2 && rect.top < window.innerHeight / 2;
-        });
-
-        if (currentSectionIndex !== -1) {
-          const nextIndex = deltaY > 0
-            ? Math.min(currentSectionIndex + 1, sections.length - 1) // Swipe Up -> Scroll Down
-            : Math.max(currentSectionIndex - 1, 0); // Swipe Down -> Scroll Up
-
-          if (nextIndex !== currentSectionIndex) {
-            isScrollingRef.current = true;
-            document.getElementById(sections[nextIndex])?.scrollIntoView({ behavior: 'smooth' });
-            
-            setTimeout(() => { isScrollingRef.current = false; }, 800);
-          }
-        }
-      }
-    };
-
     window.addEventListener('wheel', handleWheel, { passive: false });
-    window.addEventListener('touchstart', handleTouchStart, { passive: false });
-    window.addEventListener('touchmove', handleTouchMove, { passive: false });
-    window.addEventListener('touchend', handleTouchEnd, { passive: false });
 
     return () => {
       document.documentElement.classList.remove('snap-y', 'snap-mandatory');
       document.documentElement.style.scrollBehavior = '';
       window.removeEventListener('wheel', handleWheel);
-      window.removeEventListener('touchstart', handleTouchStart);
-      window.removeEventListener('touchmove', handleTouchMove);
-      window.removeEventListener('touchend', handleTouchEnd);
     };
   }, []);
 
@@ -233,7 +185,7 @@ export default function App() {
         {/* Foreground layer (Welcome content) */}
         <div className="relative z-1 flex flex-col items-center justify-center min-h-screen pointer-events-none">
           <div className="pointer-events-auto">
-            <GlassSurface width="min(90vw, 450px)" height={250} borderRadius={32} opacity={0.8} blur={15}>
+            <GlassSurface width="min(90vw, 450px)" height={250} borderRadius={32} opacity={0.8} blur={isMobile ? 4 : 15}>
               <div className="flex flex-col items-center text-center p-8">
                 <BlurText 
                   text="Welcome" 
