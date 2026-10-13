@@ -272,7 +272,7 @@ Hi, I'm Dhakshina Perera, a Full-Stack Developer and Software Engineering underg
         <div className="w-full max-w-[90vw] md:max-w-4xl pointer-events-auto -translate-y-12 md:-translate-y-20">
           <WithCard />
         </div>
-      </section>
+      </section>  
 
       {/* Projects Section */}
       <section id="projects" className="snap-start min-h-screen flex flex-col items-center justify-center relative z-10 pointer-events-none py-24">

@@ -80,7 +80,7 @@ function WithCard() {
                       <DialogTitle className="text-lg sm:text-xl tracking-wide text-white">PROCESS ASSOCIATE</DialogTitle>
                       <DialogDescription className="text-white/50">
                         INFOMATE (PVT) LIMITED – JOHN KEELLS HOLDINGS<br/>
-                        May 2025 — Current | Colombo, Sri Lanka
+                        May 2025 — Octomber 2026 | Colombo, Sri Lanka
                       </DialogDescription>
                     </DialogHeader>
                     <div className="flex flex-col gap-4 mt-4 text-sm leading-relaxed text-white/70">
