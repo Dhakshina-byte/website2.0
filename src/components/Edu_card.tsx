@@ -66,7 +66,7 @@ function WithCard() {
                       <div className="flex items-center gap-4">
                         <Clock className="size-5 text-muted-foreground flex-shrink-0" />
                         <div className="text-left">
-                          <div className="font-medium text-sm sm:text-base group-hover:text-white transition-colors text-white/90">PROCESS ASSOCIATE | May 2025 — Current</div>
+                          <div className="font-medium text-sm sm:text-base group-hover:text-white transition-colors text-white/90">PROCESS ASSOCIATE | May 2025 — Octomber 2026</div>
                           <div className="text-xs sm:text-sm text-muted-foreground mt-0.5">INFOMATE (PVT) LIMITED – JOHN KEELLS HOLDINGS - Colombo, Sri Lanka</div>
                         </div>
                       </div>
